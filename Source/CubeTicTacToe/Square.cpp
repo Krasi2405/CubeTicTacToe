@@ -2,6 +2,7 @@
 
 
 #include "Square.h"
+#include "Components/PrimitiveComponent.h"
 
 // Sets default values
 ASquare::ASquare()
@@ -15,7 +16,11 @@ ASquare::ASquare()
 void ASquare::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (!SquareMesh) {
+		UE_LOG(LogTemp, Error, TEXT("Mesh not set for Square"));
+		Destroy();
+	}
 }
 
 // Called every frame
@@ -25,11 +30,22 @@ void ASquare::Tick(float DeltaTime)
 
 }
 
-void ASquare::CheckX() {
+void ASquare::SetSquareMesh(UPrimitiveComponent* SquarePrimitive) {
+	SquareMesh = SquarePrimitive;
+}
 
+
+void ASquare::SetSquareMeshMaterial(UMaterialInterface* Material) {
+	if (Material) {
+		SquareMesh->SetMaterial(0, Material);
+	}
+}
+
+void ASquare::CheckX() {
+	SetSquareMeshMaterial(PlayerOneMaterial);
 }
 
 void ASquare::CheckO() {
-
+	SetSquareMeshMaterial(PlayerTwoMaterial);
 }
 

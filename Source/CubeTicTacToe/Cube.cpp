@@ -2,6 +2,7 @@
 
 
 #include "Cube.h"
+#include "Square.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/PrimitiveComponent.h"
@@ -39,25 +40,51 @@ void ACube::SetCubePivot(UPrimitiveComponent* CubePivot) {
 
 
 void ACube::HorizontalMovement(float Value) {
+	if (SelectedSquare) {
+		return;
+	}
 	FRotator RelativeRotation = FRotator(0, Value, 0);
 	CubePivot->AddWorldRotation(RelativeRotation);
 }
 
 
 void ACube::VerticalMovement(float Value) {
+	if (SelectedSquare) {
+		return;
+	}
 	FRotator RelativeRotation = FRotator(Value, 0, 0);
 	CubePivot->AddWorldRotation(RelativeRotation);
 }
 
 
 void ACube::Press() {
+	ASquare* Square = GetSquareAtMousePosition();
+	if (Square) {
+		SelectedSquare = Square;
+	}
+}
 
-	FVector Location;
-	FRotator Rotation;
-	GetActorEyesViewPoint(Location, Rotation);
 
-	
-	APlayerController* PlayerController = (APlayerController*) GetController();
+void ACube::Release() {
+	if (!SelectedSquare || SelectedSquare != GetSquareAtMousePosition()) {
+		SelectedSquare = nullptr;
+		return;
+	}
+
+	if (bFirstTurn) {
+		SelectedSquare->CheckX();
+	}
+	else
+	{
+		SelectedSquare->CheckO();
+	}
+	bFirstTurn = !bFirstTurn;
+	SelectedSquare = nullptr;
+}
+
+
+ASquare* ACube::GetSquareAtMousePosition() {
+	APlayerController* PlayerController = (APlayerController*)GetController();
 	if (PlayerController) {
 		float MouseX;
 		float MouseY;
@@ -66,10 +93,11 @@ void ACube::Press() {
 		FHitResult HitResult;
 		if (PlayerController->GetHitResultAtScreenPosition(MousePosition, ECC_Visibility, false, HitResult)) {
 			AActor* HitActor = HitResult.GetActor();
-			UE_LOG(LogTemp, Warning, TEXT("Hit actor %s!"), *(HitActor->GetName()))
+			ASquare* Square = dynamic_cast<ASquare*>(HitActor);
+			return Square;
 		}
 	}
-
+	return nullptr;
 }
 
 
@@ -77,6 +105,7 @@ void ACube::Press() {
 void ACube::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
 	UE_LOG(LogTemp, Warning, TEXT("SetupPlayerInputComponent!"))
 
 	if (PlayerInputComponent) {
@@ -84,6 +113,7 @@ void ACube::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		PlayerInputComponent->BindAxis("Vertical", this, &ACube::VerticalMovement);
 
 		PlayerInputComponent->BindAction("Click", IE_Pressed, this, &ACube::Press);
+		PlayerInputComponent->BindAction("Click", IE_Released, this, &ACube::Release);
 	}
 }
 

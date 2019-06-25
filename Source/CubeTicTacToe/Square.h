@@ -19,6 +19,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY(BlueprintReadOnly)
+	UPrimitiveComponent* SquareMesh;
 
 
 public:	
@@ -29,6 +31,18 @@ public:
 
 	void CheckO();
 
+	UFUNCTION(BlueprintCallable)
+	void SetSquareMesh(UPrimitiveComponent* SquarePrimitive);
+
+
 private:
 	bool hasSetOwner = false;
+
+	UPROPERTY(EditAnywhere)
+	UMaterial* PlayerOneMaterial;
+
+	UPROPERTY(EditAnywhere)
+	UMaterial* PlayerTwoMaterial;
+
+	void SetSquareMeshMaterial(UMaterialInterface* Material);
 };

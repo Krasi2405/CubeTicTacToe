@@ -6,6 +6,8 @@
 #include "GameFramework/Pawn.h"
 #include "Cube.generated.h"
 
+class ASquare;
+
 UCLASS()
 class CUBETICTACTOE_API ACube : public APawn
 {
@@ -37,4 +39,11 @@ private:
 	void VerticalMovement(float Value);
 
 	void Press();
+	void Release();
+
+	ASquare* GetSquareAtMousePosition();
+
+	ASquare* SelectedSquare = nullptr;
+
+	bool bFirstTurn = true;
 };
