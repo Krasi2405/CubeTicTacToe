@@ -10,6 +10,11 @@
 #include "TicTacToePlayerController.generated.h"
 
 
+enum class PlayerIndex {
+	FirstPlayer,
+	SecondPlayer
+};
+
 /**
  * 
  */
@@ -28,7 +33,4 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-private:
-	
 };

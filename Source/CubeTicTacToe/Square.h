@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Square.generated.h"
 
+class ATicTacToeField;
+enum class PlayerIndex;
+
 UCLASS(ClassGroup=GroupName)
 class CUBETICTACTOE_API ASquare : public AActor
 {
@@ -15,12 +18,15 @@ public:
 	// Sets default values for this actor's properties
 	ASquare();
 
+	void SetOwnerField(ATicTacToeField* Field);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadOnly)
 	UPrimitiveComponent* SquareMesh;
+
 
 
 public:	
@@ -34,15 +40,30 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSquareMesh(UPrimitiveComponent* SquarePrimitive);
 
+	void Disable();
+
+	void Enable();
+
+	bool IsDisabled();
 
 private:
-	bool hasSetOwner = false;
+	bool bSetPlayerOwner = false;
+
+	bool bDisabled = false;
+
+	ATicTacToeField* OwnerField = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	UMaterial* PlayerOneMaterial;
 
 	UPROPERTY(EditAnywhere)
 	UMaterial* PlayerTwoMaterial;
+
+	UPROPERTY(EditAnywhere)
+	UMaterial* EnabledMaterial;
+
+	UPROPERTY(EditAnywhere)
+	UMaterial* DisabledMaterial;
 
 	void SetSquareMeshMaterial(UMaterialInterface* Material);
 };

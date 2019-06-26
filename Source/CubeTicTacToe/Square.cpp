@@ -2,6 +2,8 @@
 
 
 #include "Square.h"
+#include "TicTacToeField.h"
+#include "TicTacToePlayerController.h"
 #include "Components/PrimitiveComponent.h"
 
 // Sets default values
@@ -42,10 +44,41 @@ void ASquare::SetSquareMeshMaterial(UMaterialInterface* Material) {
 }
 
 void ASquare::CheckX() {
+	if (bSetPlayerOwner) {
+		return;
+	}
 	SetSquareMeshMaterial(PlayerOneMaterial);
+	
+	OwnerField->CheckSquare(this, PlayerIndex::FirstPlayer);
+	bSetPlayerOwner = true;
+	bDisabled = true;
 }
 
 void ASquare::CheckO() {
 	SetSquareMeshMaterial(PlayerTwoMaterial);
+	OwnerField->CheckSquare(this, PlayerIndex::SecondPlayer);
+	bSetPlayerOwner = true;
+	bDisabled = true;
 }
 
+
+void ASquare::SetOwnerField(ATicTacToeField* Field) {
+	OwnerField = Field;
+}
+
+
+void ASquare::Disable() {
+	if (!bSetPlayerOwner) {
+		bDisabled = false;
+	}
+}
+
+void ASquare::Enable() {
+	if (!bSetPlayerOwner) {
+		bDisabled = true;
+	}
+}
+
+bool ASquare::IsDisabled() {
+	return bDisabled;
+}

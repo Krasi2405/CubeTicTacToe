@@ -3,6 +3,7 @@
 
 #include "Cube.h"
 #include "Square.h"
+#include "TicTacToeField.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/PrimitiveComponent.h"
@@ -12,7 +13,6 @@ ACube::ACube()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -23,6 +23,25 @@ void ACube::BeginPlay()
 	if (!CubePivot) {
 		UE_LOG(LogTemp, Error, TEXT("Cube pivot should be set from blueprint!"))
 		Destroy();
+	}
+
+	AddFields();
+}
+
+
+void ACube::AddFields() {
+	TArray<USceneComponent*> ChildComponents;
+	CubePivot->GetChildrenComponents(false, ChildComponents);
+	for (USceneComponent* Component : ChildComponents) {
+		UChildActorComponent* ChildActorComponent = dynamic_cast<UChildActorComponent*>(Component);
+		if (ChildActorComponent) {
+			AActor* ChildActor = ChildActorComponent->GetChildActor();
+			ATicTacToeField* Field = dynamic_cast<ATicTacToeField*>(ChildActor);
+			if (Field) {
+				UE_LOG(LogTemp, Warning, TEXT("Add %s to Cube"), (*Field->GetName()))
+				Fields.Add(Field);
+			}
+		}
 	}
 }
 
@@ -59,7 +78,7 @@ void ACube::VerticalMovement(float Value) {
 
 void ACube::Press() {
 	ASquare* Square = GetSquareAtMousePosition();
-	if (Square) {
+	if (Square && !Square->IsDisabled()) {
 		SelectedSquare = Square;
 	}
 }
@@ -118,3 +137,12 @@ void ACube::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 
+void ACube::SetAllowedInputFieds(TArray<ATicTacToeField*> AllowedFields) {
+	for (ATicTacToeField* Field : Fields) {
+		Field->DisableSquares();
+	}
+
+	for (ATicTacToeField* AllowedField : Fields) {
+		AllowedField->EnableSquares();
+	}
+}

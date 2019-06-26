@@ -7,6 +7,7 @@
 #include "Cube.generated.h"
 
 class ASquare;
+class ATicTacToeField;
 
 UCLASS()
 class CUBETICTACTOE_API ACube : public APawn
@@ -24,8 +25,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere)
 	UPrimitiveComponent* CubePivot;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<ATicTacToeField*> Fields = TArray<ATicTacToeField*>();
+	
+	UPROPERTY(VisibleAnywhere)
+	ASquare* SelectedSquare = nullptr;
 
 public:	
 	// Called every frame
@@ -34,7 +41,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void SetAllowedInputFieds(TArray<ATicTacToeField*> Fields);
+
 private:
+	void AddFields();
+
 	void HorizontalMovement(float Value);
 	void VerticalMovement(float Value);
 
@@ -42,8 +53,6 @@ private:
 	void Release();
 
 	ASquare* GetSquareAtMousePosition();
-
-	ASquare* SelectedSquare = nullptr;
 
 	bool bFirstTurn = true;
 };
