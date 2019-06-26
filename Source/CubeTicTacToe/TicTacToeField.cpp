@@ -7,9 +7,6 @@
 // Sets default values
 ATicTacToeField::ATicTacToeField()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	// Initialize neighbours of the 9 squares
 	for (int i = 0; i <= 8; i++) {
 		TArray<ATicTacToeField*>* Neighbours = new TArray<ATicTacToeField*>();
@@ -40,6 +37,16 @@ void ATicTacToeField::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Children have to be ordered correctly in blueprint in order for game to work correctly!
+	TArray<AActor*> ChildActors;
+	GetAllChildActors(ChildActors, false);
+	for (AActor* ChildActor : ChildActors) {
+		ASquare* Square = dynamic_cast<ASquare*>(ChildActor);
+		if (Square) {
+			Squares.Add(Square);
+		}
+	}
+
 	for (ASquare* Square : Squares) {
 		Square->SetOwnerField(this);
 	}
@@ -49,11 +56,6 @@ void ATicTacToeField::BeginPlay()
 void ATicTacToeField::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-}
-
-
-void ATicTacToeField::AddSquare(ASquare* Square) {
-	Squares.Add(Square);
 }
 
 
@@ -78,17 +80,23 @@ void ATicTacToeField::EnableSquares() {
 
 
 void ATicTacToeField::CheckSquare(ASquare* CheckedSquare, PlayerIndex PlayerIndex) {
-	UE_LOG(LogTemp, Warning, TEXT("Check Square: %s"), (*CheckedSquare->GetName()))
-	// UE_LOG(LogTemp, Warning, TEXT("Squares length: %d"), Squares.Num())
-	// int SquareIndex = Squares.IndexOfByKey(Square);
-	// TArray<ATicTacToeField*>** Neighbours = AvailableFieldsMap.Find(SquareIndex);
 
+	int SquareIndex = Squares.IndexOfByKey(CheckedSquare);
+	UE_LOG(LogTemp, Warning, TEXT("Check Square: %s with index %d"), (*CheckedSquare->GetName()), SquareIndex)
+	TArray<ATicTacToeField*>** Neighbours = AvailableFieldsMap.Find(SquareIndex);
+	UE_LOG(LogTemp, Warning, TEXT("Neighbour count: %d"), (*Neighbours)->Num())
+
+
+	for (int i = 0; i < (*Neighbours)->Num(); i++) {
+		ATicTacToeField* Field = (**Neighbours)[i];
+		// UE_LOG(LogTemp, Warning, TEXT("Neighbour: %s"), (*Field->GetName()))
+	}
 }
 
 
 void ATicTacToeField::SetNeighbours(ATicTacToeField* Top, ATicTacToeField* Right, ATicTacToeField* Bottom, ATicTacToeField* Left) {
-	//TopNeighbour = Top;
-	//RightNeighbour = Right;
-	//BottomNeighbour = Bottom;
-	//LeftNeighbour = Left;
+	TopNeighbour = Top;
+	RightNeighbour = Right;
+	BottomNeighbour = Bottom;
+	LeftNeighbour = Left;
 }

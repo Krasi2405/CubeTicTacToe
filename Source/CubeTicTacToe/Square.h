@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Materials/Material.h"
 #include "Square.generated.h"
 
 class ATicTacToeField;
@@ -66,4 +67,6 @@ private:
 	UMaterial* DisabledMaterial;
 
 	void SetSquareMeshMaterial(UMaterialInterface* Material);
+
+	void Check(PlayerIndex Player, UMaterial* PlayerMaterial);
 };

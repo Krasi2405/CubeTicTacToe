@@ -9,8 +9,6 @@
 // Sets default values
 ASquare::ASquare()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
 }
 
@@ -44,19 +42,21 @@ void ASquare::SetSquareMeshMaterial(UMaterialInterface* Material) {
 }
 
 void ASquare::CheckX() {
-	if (bSetPlayerOwner) {
-		return;
-	}
-	SetSquareMeshMaterial(PlayerOneMaterial);
-	
-	OwnerField->CheckSquare(this, PlayerIndex::FirstPlayer);
-	bSetPlayerOwner = true;
-	bDisabled = true;
+	Check(PlayerIndex::FirstPlayer, PlayerOneMaterial);
 }
 
 void ASquare::CheckO() {
-	SetSquareMeshMaterial(PlayerTwoMaterial);
-	OwnerField->CheckSquare(this, PlayerIndex::SecondPlayer);
+	Check(PlayerIndex::SecondPlayer, PlayerTwoMaterial);
+}
+
+
+void ASquare::Check(PlayerIndex Player, UMaterial* PlayerMaterial) {
+	if (bSetPlayerOwner) {
+		UE_LOG(LogTemp, Error, TEXT("Attempting to set Square owner who is already set!"))
+		return;
+	}
+	SetSquareMeshMaterial(PlayerMaterial);
+	OwnerField->CheckSquare(this, Player);
 	bSetPlayerOwner = true;
 	bDisabled = true;
 }
@@ -69,13 +69,15 @@ void ASquare::SetOwnerField(ATicTacToeField* Field) {
 
 void ASquare::Disable() {
 	if (!bSetPlayerOwner) {
-		bDisabled = false;
+		bDisabled = true;
+		SetSquareMeshMaterial(DisabledMaterial);
 	}
 }
 
 void ASquare::Enable() {
 	if (!bSetPlayerOwner) {
-		bDisabled = true;
+		bDisabled = false;
+		SetSquareMeshMaterial(EnabledMaterial);
 	}
 }
 

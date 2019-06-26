@@ -22,9 +22,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void AddSquare(ASquare* Square);
-
 	UFUNCTION(BlueprintCallable, Category = Neighbours)
 	void SetNeighbours(ATicTacToeField* Top, ATicTacToeField* Right, ATicTacToeField* Bottom, ATicTacToeField* Left);
 
