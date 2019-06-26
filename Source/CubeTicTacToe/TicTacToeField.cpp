@@ -7,35 +7,17 @@
 // Sets default values
 ATicTacToeField::ATicTacToeField()
 {
-	// Initialize neighbours of the 9 squares
-	for (int i = 0; i <= 8; i++) {
-		TArray<ATicTacToeField*>* Neighbours = new TArray<ATicTacToeField*>();
-		if (i / 3 == 0) {
-			Neighbours->Add(TopNeighbour);
-		}
-		else if (i / 3 == 2) {
-			Neighbours->Add(BottomNeighbour);
-		}
-
-		if (i % 3 == 0) {
-			Neighbours->Add(LeftNeighbour);
-		}
-		else if(i % 3 == 2)
-		{
-			Neighbours->Add(RightNeighbour);
-		}
-
-		if (Neighbours->Num() == 0) {
-			Neighbours->Add(this);
-		}
-		AvailableFieldsMap.Add(i, Neighbours);
-	}
+	
 }
 
 // Called when the game starts or when spawned
 void ATicTacToeField::BeginPlay()
 {
 	Super::BeginPlay();
+	if (!OwnerCube) {
+		UE_LOG(LogTemp, Error, TEXT("Owner of tic tac toe field %s has not been set!"), *GetName());
+		Destroy();
+	}
 
 	// Children have to be ordered correctly in blueprint in order for game to work correctly!
 	TArray<AActor*> ChildActors;
@@ -50,6 +32,30 @@ void ATicTacToeField::BeginPlay()
 	for (ASquare* Square : Squares) {
 		Square->SetOwnerField(this);
 	}
+
+	// Initialize neighbours of the 9 squares
+	for (int i = 0; i <= 8; i++) {
+		TArray<ATicTacToeField*>* Neighbours = new TArray<ATicTacToeField*>();
+		if (i / 3 == 0) {
+			Neighbours->Add(TopNeighbour);
+		}
+		else if (i / 3 == 2) {
+			Neighbours->Add(BottomNeighbour);
+		}
+
+		if (i % 3 == 0) {
+			Neighbours->Add(LeftNeighbour);
+		}
+		else if (i % 3 == 2)
+		{
+			Neighbours->Add(RightNeighbour);
+		}
+
+		if (Neighbours->Num() == 0) {
+			Neighbours->Add(this);
+		}
+		AvailableFieldsMap.Add(i, Neighbours);
+	}
 }
 
 // Called every frame
@@ -61,6 +67,7 @@ void ATicTacToeField::Tick(float DeltaTime)
 
 void ATicTacToeField::DisableSquares() {
 	if (!bSquaresDisabled) {
+		UE_LOG(LogTemp, Warning, TEXT("Disable squares!"))
 		for (ASquare* Square : Squares) {
 			Square->Disable();
 		}
@@ -89,8 +96,16 @@ void ATicTacToeField::CheckSquare(ASquare* CheckedSquare, PlayerIndex PlayerInde
 
 	for (int i = 0; i < (*Neighbours)->Num(); i++) {
 		ATicTacToeField* Field = (**Neighbours)[i];
-		// UE_LOG(LogTemp, Warning, TEXT("Neighbour: %s"), (*Field->GetName()))
+		if (Field) {
+			UE_LOG(LogTemp, Warning, TEXT("Neighbour %d: %s"), i, (*Field->GetName()))
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Neighbour %d is nullptr!"), i)
+		}
 	}
+
+	OwnerCube->SetAllowedInputFieds(**Neighbours);
 }
 
 

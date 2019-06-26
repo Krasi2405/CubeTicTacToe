@@ -141,7 +141,13 @@ void ACube::SetAllowedInputFieds(TArray<ATicTacToeField*> AllowedFields) {
 		Field->DisableSquares();
 	}
 
-	for (ATicTacToeField* AllowedField : Fields) {
-		AllowedField->EnableSquares();
+	for (ATicTacToeField* AllowedField : AllowedFields) {
+		if (AllowedField) {
+			AllowedField->EnableSquares();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Nullptr allowed field given to cube!"))
+		}
 	}
 }

@@ -56,9 +56,9 @@ void ASquare::Check(PlayerIndex Player, UMaterial* PlayerMaterial) {
 		return;
 	}
 	SetSquareMeshMaterial(PlayerMaterial);
-	OwnerField->CheckSquare(this, Player);
 	bSetPlayerOwner = true;
 	bDisabled = true;
+	OwnerField->CheckSquare(this, Player);
 }
 
 

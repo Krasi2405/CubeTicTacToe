@@ -7,6 +7,7 @@
 #include "TicTacToeField.generated.h"
 
 class ASquare;
+class ACube;
 enum class PlayerIndex;
 
 UCLASS()
@@ -37,6 +38,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Neighbours)
 	ATicTacToeField* LeftNeighbour = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Fields)
+	ACube* OwnerCube;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -56,6 +60,4 @@ private:
 
 	// Maps index of square to available fields
 	TMap<int, TArray<ATicTacToeField*>*> AvailableFieldsMap = TMap<int, TArray<ATicTacToeField*>*>();
-
-
 };
