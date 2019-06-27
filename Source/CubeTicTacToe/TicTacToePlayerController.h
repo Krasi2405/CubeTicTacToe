@@ -12,7 +12,8 @@
 
 enum class PlayerIndex {
 	FirstPlayer,
-	SecondPlayer
+	SecondPlayer,
+	None
 };
 
 /**

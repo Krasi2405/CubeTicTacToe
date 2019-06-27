@@ -9,7 +9,7 @@
 // Sets default values
 ASquare::ASquare()
 {
-
+	PlayerOwner = PlayerIndex::None;
 }
 
 // Called when the game starts or when spawned
@@ -58,7 +58,9 @@ void ASquare::Check(PlayerIndex Player, UMaterial* PlayerMaterial) {
 	SetSquareMeshMaterial(PlayerMaterial);
 	bSetPlayerOwner = true;
 	bDisabled = true;
+	PlayerOwner = Player;
 	OwnerField->CheckSquare(this, Player);
+	
 }
 
 
@@ -68,19 +70,26 @@ void ASquare::SetOwnerField(ATicTacToeField* Field) {
 
 
 void ASquare::Disable() {
-	if (!bSetPlayerOwner) {
+	if (PlayerOwner == PlayerIndex::None) {
 		bDisabled = true;
 		SetSquareMeshMaterial(DisabledMaterial);
 	}
 }
 
+
 void ASquare::Enable() {
-	if (!bSetPlayerOwner) {
+	if (PlayerOwner == PlayerIndex::None) {
 		bDisabled = false;
 		SetSquareMeshMaterial(EnabledMaterial);
 	}
 }
 
+
 bool ASquare::IsDisabled() {
 	return bDisabled;
+}
+
+
+PlayerIndex ASquare::GetPlayerOwner() {
+	return PlayerOwner;
 }

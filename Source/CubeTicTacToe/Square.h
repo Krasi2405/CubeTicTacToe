@@ -47,7 +47,11 @@ public:
 
 	bool IsDisabled();
 
+	PlayerIndex GetPlayerOwner();
+
 private:
+	PlayerIndex PlayerOwner;
+
 	bool bSetPlayerOwner = false;
 
 	bool bDisabled = false;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Components/PrimitiveComponent.h"
 #include "TicTacToeField.generated.h"
 
 class ASquare;
@@ -41,6 +42,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Fields)
 	ACube* OwnerCube;
 
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerOneColorPlane(UPrimitiveComponent* PlayerOneColorPlane);
+
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerTwoColorPlane(UPrimitiveComponent* PlayerTwoColorPlane);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerColor)
+	UPrimitiveComponent* PlayerOneColorPlane;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerColor)
+	UPrimitiveComponent* PlayerTwoColorPlane;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -51,13 +64,35 @@ public:
 
 	void CheckSquare(ASquare* Square, PlayerIndex PlayerIndex);
 
+	bool FieldIsOwnedByPlayer();
+
 private:
 	// For optimization purposes so squares are not enabled or disabled if they already are.
 	bool bSquaresDisabled = false;
+
+	PlayerIndex PlayerOwner;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<ASquare*> Squares = TArray<ASquare*>();
 
 	// Maps index of square to available fields
 	TMap<int, TArray<ATicTacToeField*>*> AvailableFieldsMap = TMap<int, TArray<ATicTacToeField*>*>();
+
+	bool CheckWinCondition(PlayerIndex Player);
+
+	bool CheckRowWinCondition(int row, PlayerIndex Player);
+
+	bool CheckCollumnWinCondition(int collumn, PlayerIndex Player);
+
+	bool CheckDiagonalsWinCondition(PlayerIndex Player);
+
+	ASquare* GetSquareAtPosition(int x, int y);
+
+	bool IsSquareOwnedByPlayer(ASquare* Square, PlayerIndex Player);
+
+	void CheckX();
+
+	void CheckO();
+
+	void Check(UPrimitiveComponent* ColorPlane, PlayerIndex Player);
 };
