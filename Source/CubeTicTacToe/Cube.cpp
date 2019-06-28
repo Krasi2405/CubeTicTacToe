@@ -29,17 +29,12 @@ void ACube::BeginPlay()
 
 
 void ACube::AddFields() {
-	TArray<USceneComponent*> ChildComponents;
-	CubePivot->GetChildrenComponents(false, ChildComponents);
-	for (USceneComponent* Component : ChildComponents) {
-		UChildActorComponent* ChildActorComponent = dynamic_cast<UChildActorComponent*>(Component);
-		if (ChildActorComponent) {
-			AActor* ChildActor = ChildActorComponent->GetChildActor();
-			ATicTacToeField* Field = dynamic_cast<ATicTacToeField*>(ChildActor);
-			if (Field) {
-				UE_LOG(LogTemp, Warning, TEXT("Add %s to Cube"), (*Field->GetName()))
-				Fields.Add(Field);
-			}
+	TArray<AActor*> ChildActors;
+	GetAllChildActors(ChildActors);
+	for (AActor* ChildActor : ChildActors) {
+		ATicTacToeField* Field = dynamic_cast<ATicTacToeField*>(ChildActor);
+		if (Field) {
+			Fields.Add(Field);
 		}
 	}
 }
@@ -90,11 +85,11 @@ void ACube::Release() {
 	}
 
 	if (bFirstTurn) {
-		SelectedSquare->CheckX();
+		SelectedSquare->MarkX();
 	}
 	else
 	{
-		SelectedSquare->CheckO();
+		SelectedSquare->MarkO();
 	}
 	bFirstTurn = !bFirstTurn;
 	SelectedSquare = nullptr;
@@ -142,12 +137,10 @@ void ACube::SetAllowedInputFieds(TArray<ATicTacToeField*> AllowedFields) {
 	}
 
 	for (ATicTacToeField* AllowedField : AllowedFields) {
+		checkf(AllowedField != nullptr, TEXT("Nullptr allowed field given to cube!"));
+
 		if (AllowedField) {
 			AllowedField->EnableSquares();
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Nullptr allowed field given to cube!"))
 		}
 	}
 }

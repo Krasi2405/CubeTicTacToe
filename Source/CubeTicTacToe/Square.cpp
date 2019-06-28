@@ -17,10 +17,7 @@ void ASquare::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!SquareMesh) {
-		UE_LOG(LogTemp, Error, TEXT("Mesh not set for Square"));
-		Destroy();
-	}
+	check(SquareMesh != nullptr)
 }
 
 // Called every frame
@@ -41,26 +38,24 @@ void ASquare::SetSquareMeshMaterial(UMaterialInterface* Material) {
 	}
 }
 
-void ASquare::CheckX() {
-	Check(PlayerIndex::FirstPlayer, PlayerOneMaterial);
+void ASquare::MarkX() {
+	Mark(PlayerIndex::FirstPlayer, PlayerOneMaterial);
 }
 
-void ASquare::CheckO() {
-	Check(PlayerIndex::SecondPlayer, PlayerTwoMaterial);
+void ASquare::MarkO() {
+	Mark(PlayerIndex::SecondPlayer, PlayerTwoMaterial);
 }
 
 
-void ASquare::Check(PlayerIndex Player, UMaterial* PlayerMaterial) {
-	if (bSetPlayerOwner) {
+void ASquare::Mark(PlayerIndex Player, UMaterial* PlayerMaterial) {
+	if (PlayerOwner != PlayerIndex::None) {
 		UE_LOG(LogTemp, Error, TEXT("Attempting to set Square owner who is already set!"))
 		return;
 	}
 	SetSquareMeshMaterial(PlayerMaterial);
-	bSetPlayerOwner = true;
 	bDisabled = true;
 	PlayerOwner = Player;
-	OwnerField->CheckSquare(this, Player);
-	
+	OwnerField->MarkSquare(this, Player);
 }
 
 
@@ -69,18 +64,26 @@ void ASquare::SetOwnerField(ATicTacToeField* Field) {
 }
 
 
-void ASquare::Disable() {
+void ASquare::DisableInput() {
 	if (PlayerOwner == PlayerIndex::None) {
 		bDisabled = true;
 		SetSquareMeshMaterial(DisabledMaterial);
 	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Attempting to disable square when owner is already set!"))
+	}
 }
 
 
-void ASquare::Enable() {
+void ASquare::EnableInput() {
 	if (PlayerOwner == PlayerIndex::None) {
 		bDisabled = false;
 		SetSquareMeshMaterial(EnabledMaterial);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Attempting to enable square when owner is already set!"))	
 	}
 }
 

@@ -62,21 +62,31 @@ public:
 
 	void EnableSquares();
 
-	void CheckSquare(ASquare* Square, PlayerIndex PlayerIndex);
+	void MarkSquare(ASquare* Square, PlayerIndex PlayerIndex);
 
-	bool FieldIsOwnedByPlayer();
+	PlayerIndex GetPlayerOwner();
 
 private:
-	// For optimization purposes so squares are not enabled or disabled if they already are.
-	bool bSquaresDisabled = false;
-
-	PlayerIndex PlayerOwner;
-
 	UPROPERTY(VisibleAnywhere)
 	TArray<ASquare*> Squares = TArray<ASquare*>();
 
 	// Maps index of square to available fields
 	TMap<int, TArray<ATicTacToeField*>*> AvailableFieldsMap = TMap<int, TArray<ATicTacToeField*>*>();
+
+	// For optimization purposes so squares are not enabled or disabled if they already are.
+	bool bSquaresDisabled = false;
+
+	PlayerIndex PlayerOwner;
+
+	void InitializeSquareNeighbours();
+
+	void InitializeSquareChildren();
+
+	void MarkX();
+
+	void MarkO();
+
+	void Mark(UPrimitiveComponent* ColorPlane, PlayerIndex Player);
 
 	bool CheckWinCondition(PlayerIndex Player);
 
@@ -86,13 +96,7 @@ private:
 
 	bool CheckDiagonalsWinCondition(PlayerIndex Player);
 
-	ASquare* GetSquareAtPosition(int x, int y);
-
 	bool IsSquareOwnedByPlayer(ASquare* Square, PlayerIndex Player);
 
-	void CheckX();
-
-	void CheckO();
-
-	void Check(UPrimitiveComponent* ColorPlane, PlayerIndex Player);
+	ASquare* GetSquareAtPosition(int x, int y);
 };

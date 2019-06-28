@@ -34,16 +34,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void CheckX();
+	void MarkX();
 
-	void CheckO();
+	void MarkO();
 
 	UFUNCTION(BlueprintCallable)
 	void SetSquareMesh(UPrimitiveComponent* SquarePrimitive);
 
-	void Disable();
+	void DisableInput();
 
-	void Enable();
+	void EnableInput();
 
 	bool IsDisabled();
 
@@ -51,8 +51,6 @@ public:
 
 private:
 	PlayerIndex PlayerOwner;
-
-	bool bSetPlayerOwner = false;
 
 	bool bDisabled = false;
 
@@ -72,5 +70,5 @@ private:
 
 	void SetSquareMeshMaterial(UMaterialInterface* Material);
 
-	void Check(PlayerIndex Player, UMaterial* PlayerMaterial);
+	void Mark(PlayerIndex Player, UMaterial* PlayerMaterial);
 };

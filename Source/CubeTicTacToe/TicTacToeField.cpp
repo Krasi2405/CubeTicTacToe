@@ -14,25 +14,21 @@ ATicTacToeField::ATicTacToeField()
 void ATicTacToeField::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!OwnerCube) {
-		UE_LOG(LogTemp, Error, TEXT("Owner of tic tac toe field %s has not been set!"), *GetName());
-		Destroy();
-	}
 
-	// Children have to be ordered correctly in blueprint in order for game to work correctly!
-	TArray<AActor*> ChildActors;
-	GetAllChildActors(ChildActors, false);
-	for (AActor* ChildActor : ChildActors) {
-		ASquare* Square = dynamic_cast<ASquare*>(ChildActor);
-		if (Square) {
-			Squares.Add(Square);
-		}
-	}
+	checkf(OwnerCube != nullptr, TEXT("Owner of tic tac toe field %s has not been set!"))
 
-	for (ASquare* Square : Squares) {
-		Square->SetOwnerField(this);
-	}
+	InitializeSquareChildren();
+	InitializeSquareNeighbours();
+}
 
+// Called every frame
+void ATicTacToeField::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+
+void ATicTacToeField::InitializeSquareNeighbours() {
 	// Initialize neighbours of the 9 squares
 	for (int i = 0; i <= 8; i++) {
 		TArray<ATicTacToeField*>* Neighbours = new TArray<ATicTacToeField*>();
@@ -58,18 +54,25 @@ void ATicTacToeField::BeginPlay()
 	}
 }
 
-// Called every frame
-void ATicTacToeField::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+
+void ATicTacToeField::InitializeSquareChildren() {
+	// Children have to be ordered correctly in blueprint in order for game to work correctly!
+	TArray<AActor*> ChildActors;
+	GetAllChildActors(ChildActors, false);
+	for (AActor* ChildActor : ChildActors) {
+		ASquare* Square = dynamic_cast<ASquare*>(ChildActor);
+		if (Square) {
+			Square->SetOwnerField(this);
+			Squares.Add(Square);
+		}
+	}
 }
 
 
 void ATicTacToeField::DisableSquares() {
 	if (!bSquaresDisabled) {
-		UE_LOG(LogTemp, Warning, TEXT("Disable squares!"))
 		for (ASquare* Square : Squares) {
-			Square->Disable();
+			Square->DisableInput();
 		}
 		bSquaresDisabled = true;
 	}
@@ -79,45 +82,29 @@ void ATicTacToeField::DisableSquares() {
 void ATicTacToeField::EnableSquares() {
 	if (bSquaresDisabled) {
 		for (ASquare* Square : Squares) {
-			Square->Enable();
+			Square->EnableInput();
 		}
 		bSquaresDisabled = false;
 	}
 }
 
 
-void ATicTacToeField::CheckSquare(ASquare* CheckedSquare, PlayerIndex Player) {
-
+void ATicTacToeField::MarkSquare(ASquare* CheckedSquare, PlayerIndex Player) {
 	int SquareIndex = Squares.IndexOfByKey(CheckedSquare);
 	UE_LOG(LogTemp, Warning, TEXT("Check Square: %s with index %d"), (*CheckedSquare->GetName()), SquareIndex)
 	TArray<ATicTacToeField*>** Neighbours = AvailableFieldsMap.Find(SquareIndex);
-	UE_LOG(LogTemp, Warning, TEXT("Neighbour count: %d"), (*Neighbours)->Num())
 
-
-	for (int i = 0; i < (*Neighbours)->Num(); i++) {
-		ATicTacToeField* Field = (**Neighbours)[i];
-		if (Field) {
-			UE_LOG(LogTemp, Warning, TEXT("Neighbour %d: %s"), i, (*Field->GetName()))
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Neighbour %d is nullptr!"), i)
-		}
-	}
-
-	// OwnerCube->SetAllowedInputFieds(**Neighbours);
+	OwnerCube->SetAllowedInputFieds(**Neighbours);
 
 	if (CheckWinCondition(Player)) {
+		check(Player != PlayerIndex::None)
+
 		if (Player == PlayerIndex::FirstPlayer) {
-			CheckX();
+			MarkX();
 		}
 		else if (Player == PlayerIndex::SecondPlayer) 
 		{
-			CheckO();
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Game developer is debil! Only players are allowed to win!"))
+			MarkO();
 		}
 	}
 }
@@ -195,23 +182,23 @@ bool ATicTacToeField::IsSquareOwnedByPlayer(ASquare* Square, PlayerIndex Player)
 }
 
 
-void ATicTacToeField::CheckX() {
+void ATicTacToeField::MarkX() {
 	verify(PlayerTwoColorPlane)
 
 	UE_LOG(LogTemp, Warning, TEXT("Player X has won!"))
-	Check(PlayerOneColorPlane, PlayerIndex::FirstPlayer);
+	Mark(PlayerOneColorPlane, PlayerIndex::FirstPlayer);
 }
 
 
-void ATicTacToeField::CheckO() {
+void ATicTacToeField::MarkO() {
 	verify(PlayerTwoColorPlane)
 
 	UE_LOG(LogTemp, Warning, TEXT("Player O has won!"))
-	Check(PlayerTwoColorPlane, PlayerIndex::SecondPlayer);
+	Mark(PlayerTwoColorPlane, PlayerIndex::SecondPlayer);
 }
 
 
-void ATicTacToeField::Check(UPrimitiveComponent* ColorPlane, PlayerIndex Player) {
+void ATicTacToeField::Mark(UPrimitiveComponent* ColorPlane, PlayerIndex Player) {
 	ColorPlane->SetVisibility(true);
 	PlayerOwner = Player;
 	for (ASquare* Square : Squares) {
@@ -219,9 +206,8 @@ void ATicTacToeField::Check(UPrimitiveComponent* ColorPlane, PlayerIndex Player)
 	}
 }
 
-
-bool ATicTacToeField::FieldIsOwnedByPlayer() {
-	return PlayerOwner != PlayerIndex::None;
+PlayerIndex ATicTacToeField::GetPlayerOwner() {
+	return PlayerOwner;
 }
 
 
