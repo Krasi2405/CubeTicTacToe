@@ -65,25 +65,17 @@ void ASquare::SetOwnerField(ATicTacToeField* Field) {
 
 
 void ASquare::DisableInput() {
-	if (PlayerOwner == PlayerIndex::None) {
+	if (PlayerOwner == PlayerIndex::None && !bDisabled) {
 		bDisabled = true;
 		SetSquareMeshMaterial(DisabledMaterial);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Attempting to disable square when owner is already set!"))
 	}
 }
 
 
 void ASquare::EnableInput() {
-	if (PlayerOwner == PlayerIndex::None) {
+	if (PlayerOwner == PlayerIndex::None && bDisabled) {
 		bDisabled = false;
 		SetSquareMeshMaterial(EnabledMaterial);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Attempting to enable square when owner is already set!"))	
 	}
 }
 

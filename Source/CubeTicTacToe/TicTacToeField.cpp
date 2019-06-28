@@ -94,7 +94,7 @@ void ATicTacToeField::MarkSquare(ASquare* CheckedSquare, PlayerIndex Player) {
 	UE_LOG(LogTemp, Warning, TEXT("Check Square: %s with index %d"), (*CheckedSquare->GetName()), SquareIndex)
 	TArray<ATicTacToeField*>** Neighbours = AvailableFieldsMap.Find(SquareIndex);
 
-	OwnerCube->SetAllowedInputFieds(**Neighbours);
+	// OwnerCube->SetAllowedInputFieds(**Neighbours);
 
 	if (CheckWinCondition(Player)) {
 		check(Player != PlayerIndex::None)
@@ -185,7 +185,6 @@ bool ATicTacToeField::IsSquareOwnedByPlayer(ASquare* Square, PlayerIndex Player)
 void ATicTacToeField::MarkX() {
 	verify(PlayerTwoColorPlane)
 
-	UE_LOG(LogTemp, Warning, TEXT("Player X has won!"))
 	Mark(PlayerOneColorPlane, PlayerIndex::FirstPlayer);
 }
 
@@ -193,7 +192,6 @@ void ATicTacToeField::MarkX() {
 void ATicTacToeField::MarkO() {
 	verify(PlayerTwoColorPlane)
 
-	UE_LOG(LogTemp, Warning, TEXT("Player O has won!"))
 	Mark(PlayerTwoColorPlane, PlayerIndex::SecondPlayer);
 }
 
@@ -204,6 +202,7 @@ void ATicTacToeField::Mark(UPrimitiveComponent* ColorPlane, PlayerIndex Player) 
 	for (ASquare* Square : Squares) {
 		Square->Destroy();
 	}
+	OwnerCube->MarkField(this);
 }
 
 PlayerIndex ATicTacToeField::GetPlayerOwner() {
@@ -218,4 +217,22 @@ void ATicTacToeField::SetPlayerOneColorPlane(UPrimitiveComponent* PlayerOneColor
 
 void ATicTacToeField::SetPlayerTwoColorPlane(UPrimitiveComponent* PlayerTwoColorPlane) {
 	this->PlayerTwoColorPlane = PlayerTwoColorPlane;
+}
+
+
+ATicTacToeField* ATicTacToeField::GetNeighbourInDirection(NeighbourDirection Direction) {
+	switch (Direction) {
+		case NeighbourDirection::Top:
+			return TopNeighbour;
+		case NeighbourDirection::Right:
+			return RightNeighbour;
+		case NeighbourDirection::Bottom:
+			return BottomNeighbour;
+		case NeighbourDirection::Left:
+			return LeftNeighbour;
+		default:
+			checkNoEntry();
+			break;
+	}
+	return nullptr;
 }

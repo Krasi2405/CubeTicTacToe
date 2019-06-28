@@ -11,6 +11,13 @@ class ASquare;
 class ACube;
 enum class PlayerIndex;
 
+enum class NeighbourDirection {
+	Top,
+	Right,
+	Bottom,
+	Left
+};
+
 UCLASS()
 class CUBETICTACTOE_API ATicTacToeField : public AActor
 {
@@ -19,6 +26,9 @@ class CUBETICTACTOE_API ATicTacToeField : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ATicTacToeField();
+
+
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -65,6 +75,8 @@ public:
 	void MarkSquare(ASquare* Square, PlayerIndex PlayerIndex);
 
 	PlayerIndex GetPlayerOwner();
+
+	ATicTacToeField* GetNeighbourInDirection(NeighbourDirection Direction);
 
 private:
 	UPROPERTY(VisibleAnywhere)

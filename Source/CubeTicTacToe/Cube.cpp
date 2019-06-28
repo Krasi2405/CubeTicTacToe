@@ -4,6 +4,7 @@
 #include "Cube.h"
 #include "Square.h"
 #include "TicTacToeField.h"
+#include "TicTacToePlayerController.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/PrimitiveComponent.h"
@@ -142,5 +143,52 @@ void ACube::SetAllowedInputFieds(TArray<ATicTacToeField*> AllowedFields) {
 		if (AllowedField) {
 			AllowedField->EnableSquares();
 		}
+	}
+}
+
+
+void ACube::MarkField(ATicTacToeField* Field) {
+	PlayerIndex FieldOwner = Field->GetPlayerOwner();
+	if (HasWon(FieldOwner, Field)) {
+		if (FieldOwner == PlayerIndex::FirstPlayer) {
+			UE_LOG(LogTemp, Warning, TEXT("First Player won!"))
+		}
+		else if (FieldOwner == PlayerIndex::SecondPlayer)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Second Player won!"))
+		}
+	}
+	CompletedFields += 1;
+	if (CompletedFields >= Fields.Num()) {
+		UE_LOG(LogTemp, Warning, TEXT("Draw!"))
+	}
+}
+
+
+bool ACube::HasWon(PlayerIndex Player, ATicTacToeField* StartingField) {
+	// AdjacentFieldsForWin - 1 because StartingField is counted towards them.
+	return
+		HasWonDirection(Player, StartingField, NeighbourDirection::Top, AdjacentFieldsForWin - 1) ||
+		HasWonDirection(Player, StartingField, NeighbourDirection::Right, AdjacentFieldsForWin - 1) ||
+		HasWonDirection(Player, StartingField, NeighbourDirection::Bottom, AdjacentFieldsForWin - 1) ||
+		HasWonDirection(Player, StartingField, NeighbourDirection::Left, AdjacentFieldsForWin - 1);
+}
+
+
+bool ACube::HasWonDirection(PlayerIndex Player, ATicTacToeField* Field, NeighbourDirection Direction, int HopLimit) {
+	check(Field->GetPlayerOwner() == Player)
+	check(Field != nullptr)
+
+	if (HopLimit <= 0) {
+		return true;
+	}
+
+	ATicTacToeField* Neighbour = Field->GetNeighbourInDirection(Direction);
+	if (Neighbour->GetPlayerOwner() == Player) {
+		return HasWonDirection(Player, Neighbour, Direction, HopLimit - 1);
+	}
+	else
+	{
+		return false;
 	}
 }
