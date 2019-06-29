@@ -5,6 +5,7 @@
 #include "Square.h"
 #include "TicTacToeField.h"
 #include "TicTacToePlayerController.h"
+#include "TicTacToeHUD.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/PrimitiveComponent.h"
@@ -12,7 +13,7 @@
 // Sets default values
 ACube::ACube()
 {
-
+	PlayerTurn = PlayerIndex::FirstPlayer;
 }
 
 // Called when the game starts or when spawned
@@ -26,6 +27,10 @@ void ACube::BeginPlay()
 	}
 
 	AddFields();
+
+	HUD = Cast<ATicTacToeHUD>(GetWorld()->GetFirstPlayerController()->GetHUD());
+	check(HUD != nullptr);
+	HUD->UpdatePlayerTurn(PlayerTurn);
 }
 
 
@@ -85,15 +90,18 @@ void ACube::Release() {
 		return;
 	}
 
-	if (bFirstTurn) {
+	if (PlayerTurn == PlayerIndex::FirstPlayer) {
 		SelectedSquare->MarkX();
+		PlayerTurn = PlayerIndex::SecondPlayer;
 	}
-	else
+	else if(PlayerTurn == PlayerIndex::SecondPlayer)
 	{
 		SelectedSquare->MarkO();
+		PlayerTurn = PlayerIndex::FirstPlayer;
 	}
-	bFirstTurn = !bFirstTurn;
 	SelectedSquare = nullptr;
+
+	HUD->UpdatePlayerTurn(PlayerTurn);
 }
 
 

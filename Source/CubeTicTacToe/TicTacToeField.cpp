@@ -94,7 +94,7 @@ void ATicTacToeField::MarkSquare(ASquare* CheckedSquare, PlayerIndex Player) {
 	UE_LOG(LogTemp, Warning, TEXT("Check Square: %s with index %d"), (*CheckedSquare->GetName()), SquareIndex)
 	TArray<ATicTacToeField*>** Neighbours = AvailableFieldsMap.Find(SquareIndex);
 
-	// OwnerCube->SetAllowedInputFieds(**Neighbours);
+	OwnerCube->SetAllowedInputFieds(**Neighbours);
 
 	if (CheckWinCondition(Player)) {
 		check(Player != PlayerIndex::None)

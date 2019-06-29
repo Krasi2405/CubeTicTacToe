@@ -8,8 +8,11 @@
 
 class ASquare;
 class ATicTacToeField;
+class ATicTacToeHUD;
 enum class PlayerIndex;
 enum class NeighbourDirection;
+
+
 
 UCLASS()
 class CUBETICTACTOE_API ACube : public APawn
@@ -48,6 +51,8 @@ public:
 	void MarkField(ATicTacToeField* Field);
 
 private:
+	ATicTacToeHUD* HUD;
+
 	UPROPERTY(EditAnywhere)
 	int AdjacentFieldsForWin = 3;
 
@@ -61,7 +66,7 @@ private:
 
 	ASquare* GetSquareAtMousePosition();
 
-	bool bFirstTurn = true;
+	PlayerIndex PlayerTurn;
 
 	bool HasWon(PlayerIndex Player, ATicTacToeField* StartingField);
 
